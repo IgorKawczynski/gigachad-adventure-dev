@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,7 +16,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Transform player; // Reference to player object
     [SerializeField] private Transform finishLine; // Reference to finish on the map
     [SerializeField] private string nextLevelName;
-
+    [SerializeField] private GameObject menu;
+    private bool menuActive;
+ 
     private bool hasReachedFinishLine = false;
 
     private void Awake() {
@@ -28,8 +31,8 @@ public class GameManager : MonoBehaviour
 // Throws ArgumentNullException after the start due to disabled GameOverCanvas UI, game works fine though
     public void GameOver() {
         if(_gameOverCanvas != null ) {
-        _gameOverCanvas.SetActive(true);
-    }
+            _gameOverCanvas.SetActive(true);
+        }
         Time.timeScale = 0f;
     }
 // Loading actual scene another time
@@ -41,10 +44,16 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(nextLevelName);
     }
 
-// Loading next map
+// Loading next map / pause menu
     private void Update() {
-        if (!hasReachedFinishLine && player.position.x >= finishLine.position.x)
-        {
+
+        if(Input.GetKeyDown(KeyCode.Escape)) { 
+            if(menu != null) { 
+                Pause();
+            }
+        }
+
+        if (!hasReachedFinishLine && player.position.x >= finishLine.position.x) {
             hasReachedFinishLine = true;
             _audioSource.clip = _audioClip;
             _audioSource.volume = 0.7f;
@@ -55,8 +64,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private IEnumerator TransitionToNextLevel()
-    {
+    private IEnumerator TransitionToNextLevel() {
         if(nextLevelName != "EndGame") {
             nextSceneText.SetActive(true);
         }
@@ -67,5 +75,33 @@ public class GameManager : MonoBehaviour
         nextSceneText.SetActive(false);
         hasReachedFinishLine = false;
     }
+
+    public void Pause() {
+        menuActive = !menuActive;
+        // Finding all audios ingame
+        AudioSource[] audioSources = FindObjectsOfType<AudioSource>();
+        foreach (AudioSource audio in audioSources)
+        {
+            // mute every sound found ingame
+            audio.mute = menuActive;
+        }
+        menu.SetActive(menuActive);
+        Time.timeScale = menuActive ? 0 : 1;
+    }
+
+
+    public void Menu() {
+        SceneManager.LoadScene("StartGame");
+    }
+
+
+    public void Exit() {
+        Application.Quit();
+    }
+
+    public void Reset() {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
 
 }
