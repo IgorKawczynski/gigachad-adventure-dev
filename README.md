@@ -1,4 +1,4 @@
-# climb-adventure-dev
+# gigachad-adventure-dev
 Complete pack of assets - 2D game created with Unity engine.
 ![image](https://github.com/IgorKawczynski/climb-adventure/assets/73948605/a955a95f-7b8a-487c-9e6c-612bbb0e7282)
 
